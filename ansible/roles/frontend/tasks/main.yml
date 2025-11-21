@@ -1,0 +1,59 @@
+---
+
+- name: Install Deps
+  apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - python3-requests
+    state: present
+    update_cache: true
+
+- name: Add GPG
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Repo
+  apt_repository:
+    repo: "deb [arch=amd64] {{ docker_repo_url }} {{ ansible_distribution_release }} stable"
+    state: present
+
+- name: Install Docker
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+- name: Start Docker
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+
+- name: Create Dir
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    mode: '0755'
+
+
+- name: Copy Compose
+  copy:
+    src: compose.yml
+    dest: "{{ app_dir }}/compose.yml"
+    mode: '0644'
+  register: compose_file
+
+
+- name: Start App
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_dir }}"
+    state: present
+

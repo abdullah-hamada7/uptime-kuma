@@ -1,0 +1,3 @@
+---
+docker_repo_url: "https://download.docker.com/linux/ubuntu"
+app_dir: "/opt/uptime-kuma"

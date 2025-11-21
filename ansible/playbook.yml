@@ -1,0 +1,7 @@
+---
+- name: Deploy Frontend Application
+  hosts: frontend
+  become: true
+  roles:
+    - frontend
+    - monitoring

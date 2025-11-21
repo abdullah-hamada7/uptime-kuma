@@ -1,0 +1,34 @@
+name: Deploy Frontend Application
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6.0.0
+
+      - name: Build Step
+        run: |
+          echo "Building frontend application..."
+          echo "Build completed at $(date)"
+
+      - name: Create SSH Key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > frontend_ssh_key
+          chmod 600 frontend_ssh_key
+
+      - name: Deploy with Ansible
+        run: |
+          cd ansible
+          ansible-playbook -i inventory.ini playbook.yml
+
+      - name: Cleanup
+        if: always()
+        run: rm -f frontend_ssh_key
